@@ -92,14 +92,15 @@ body {
 .video-player .progress-bar {
   position: relative;
   height: 100%;
-  background-color: #fff;
+  background-color: red;
   border-radius: 8px;
   transition: all 0.3s ease-in-out;
 }
 .video-player .buffer-bar {
+  width: 100%;
   position: absolute;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.34);
+  /* background-color: rgba(255, 255, 255, 0.34) !important; */
   border-radius: 8px;
   transition: all 0.3s ease-in-out;
 }
@@ -195,7 +196,7 @@ body {
 .control-buttons .control-left,
 .control-buttons .control-right {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   gap: 1rem;
 }
@@ -219,7 +220,8 @@ body {
   margin: 0;
   margin-top: -4px;
   padding: 0;
-  color: #fff;
+  color: rgb(255, 255, 255, 0.75);
+  user-select: none;
 }
 
 .volume-container {
@@ -282,4 +284,8 @@ body {
 .volume-icon {
   display: flex;
   align-items: center;
+}
+
+.duration-splitter {
+  margin: 0 0.5rem;
 }
