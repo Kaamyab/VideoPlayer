@@ -93,7 +93,7 @@ const VideoPlayer2 = ({ url }) => {
     };
 
     const TimeFormatter = (time) => {
-        const MS = [('0' + Math.floor(time / 60)).slice(-2), ('0' + time % 60).slice(-2)];
+        const MS = [('0' + Math.floor(time / 60)).slice(-2), ('0' + Math.floor(time % 60)).slice(-2)];
         const FinalFormat = MS[0] + ' : ' + MS[1];
         return FinalFormat;
     }
