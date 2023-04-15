@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Maximize2, Pause, Play, PlayCircle, VolumeCross, VolumeHigh, VolumeLow } from 'iconsax-react';
-import '../VideoPlayer.css';
+import Settings from './Settings';
+import useQuality from '../hooks/useQuality';
+// import useNetwork from '../hooks/useNetwork'
 
-const VideoPlayer2 = ({ url }) => {
+const VideoPlayer2 = ({ sources }) => {
 
     const videoRef = useRef(null);
     const progressRef = useRef(null);
@@ -14,10 +16,14 @@ const VideoPlayer2 = ({ url }) => {
     const [isWaiting, setIsWaiting] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [durationSec, setDurationSec] = useState(videoRef?.current?.duration);
+    const [elapsedSec, setElapsedSec] = useState(0)
     const [elapsed, setElapsed] = useState('00 : 00')
     const [isFullscreen, setIsFullscreen] = useState(false)
     const [volume, setVolume] = useState(1);
+    // const [buffer, setBuffer] = useState()
     // const [VideoBuffered, setVideoBuffered] = useState([])
+
+    const [selected, { setQuality }] = useQuality(sources)
 
     const togglePlay = () => {
         if (videoRef.current) {
@@ -86,6 +92,7 @@ const VideoPlayer2 = ({ url }) => {
         const duration = element.duration;
         const time = TimeFormatter(Math.floor(element.currentTime));
         setElapsed(time)
+        setElapsedSec(element.currentTime)
         if (progressRef && duration > 0) {
             progressRef.current.style.width =
                 (element.currentTime / duration) * 100 + "%";
@@ -102,6 +109,20 @@ const VideoPlayer2 = ({ url }) => {
         const duration = videoRef.current.duration
         setDurationSec(TimeFormatter(duration))
     }
+
+    useEffect(() => {
+        const video = videoRef.current
+        setIsWaiting(true)
+        video.pause()
+        video.src = selected.src
+        video.currentTime = elapsedSec
+        setIsWaiting(false)
+        video.play()
+        // Canvas Styles
+        const context = bufferRef.current.getContext('2d')
+        context.clearRect(0, 0, bufferRef.current.width, bufferRef.current.height);
+        // eslint-disable-next-line
+    }, [selected.src])
 
     useEffect(() => {
         if (!videoRef.current) {
@@ -209,12 +230,12 @@ const VideoPlayer2 = ({ url }) => {
                 break;
         }
     }
-
+    // const { autoQuality } = useNetwork()
 
     return (
         <div ref={videoPlayer} className="video-player">
             <div
-                onMouseOver={() => {
+                onMouseMove={() => {
                     controls.current.classList.add('show')
                 }}
                 onMouseLeave={() => !videoRef.current.paused && controls.current.classList.remove('show')}
@@ -226,10 +247,12 @@ const VideoPlayer2 = ({ url }) => {
                 </div>
                 <video
                     ref={videoRef}
-                    src={"https://kaamyab.dev/videoplayer/1.mp4"}
+                    src={'https://kaamyab.dev/videoplayer/1080.mp4'}
+                    poster='https://kaamyab.dev/videoplayer/poster.webp'
                     onClick={togglePlay}
                     onKeyDown={onKeyDown}
                     onKeyUp={onKeyUp}
+                    className='object-cover'
                 />
                 <div ref={controls} className="controls">
 
@@ -248,16 +271,17 @@ const VideoPlayer2 = ({ url }) => {
                     {/* Buttons */}
                     <div className='control-buttons'>
                         {/* LeftSide */}
-                        <div className='control-buttons control-left'>
-                            <button onClick={togglePlay}>
+                        <div className='control-buttons control-left [&>*]:h-full'>
+                            <button onClick={togglePlay} className=''>
                                 {isPlaying ? (
                                     <Pause size="24" color="#fff" />
                                 ) : (
                                     <Play size="24" color="#fff" />
                                 )}
                             </button>
-                            <p className='timer'>{elapsed} <span className='duration-splitter'> / </span> {durationSec}</p>
+                            <div className='timer'>{elapsed}<span className='duration-splitter'> / </span>{durationSec}</div>
                         </div>
+
                         {/* RightSide */}
                         <div className='control-buttons control-right'>
                             {/* Volume */}
@@ -279,6 +303,7 @@ const VideoPlayer2 = ({ url }) => {
                                     </div>
                                 </div>
                             </div>
+                            <Settings sources={sources} setQuality={setQuality} selectedQuality={selected} />
                             <Maximize2 size="24" color="#fff" onClick={toggleFullscreen} />
                         </div>
                     </div>
